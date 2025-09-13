@@ -63,6 +63,8 @@ class Config {
 	 * Extra configurations for the Arrow Paths.
 	 */
 	public static var ARROW_PATHS_CONFIG:ArrowPathConfig = {
+		APPLY_COLOR: false,
+		APPLY_ALPHA: true,
 		APPLY_DEPTH: true,
 		APPLY_SCALE: false,
 		RESOLUTION: 1,
@@ -100,9 +102,28 @@ class Config {
 	 * Default: `true`
 	 */
 	public static var COLUMN_SPECIFIC_MODIFIERS:Bool = true;
+
+	/**
+	 * Shows the sustains behind the strums
+	 * 
+	 * Default `false`
+	 */
+	public static var HOLDS_BEHIND_STRUM:Bool = false;
 }
 
 typedef ArrowPathConfig = {
+	/**
+	 * Line alpha gets affected
+	 * by color/glow modifiers.
+	 */
+	APPLY_COLOR:Bool,
+
+	/**
+	 * Line alpha gets affected
+	 * by alpha modifiers.
+	 */
+	APPLY_ALPHA:Bool,
+
 	/**
 	 * Thickness gets affected by Z.
 	 */
@@ -114,11 +135,11 @@ typedef ArrowPathConfig = {
 	APPLY_SCALE:Bool,
 
 	/**
-	 * "Resulution" multiplier of arrow paths.
+	 * "Resolution" multiplier of arrow paths.
 	 * Higher value = More divisions = Smoother path.
 	 * **WARNING**: Can't be zero or it will CRASH.
 	 */
-	RESOLUTION:Int,
+	RESOLUTION:Float,
 
 	/**
 	 * Path lines length addition.
