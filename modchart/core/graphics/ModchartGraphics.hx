@@ -20,15 +20,15 @@ import openfl.geom.ColorTransform;
 import openfl.geom.Matrix;
 import openfl.geom.Vector3D;
 
-var rotationVector = new Vector3D();
-var helperVector = new Vector3D();
+var rotationVector = new Vector3();
+var helperVector = new Vector3();
 var __matrix:Matrix = new Matrix();
-var pathVector = new Vector3D();
+var pathVector = new Vector3();
 
 typedef HoldSegmentOutput = {
 	depth:Float,
-	left:Vector3D,
-	right:Vector3D,
+	left:Vector3,
+	right:Vector3,
 	visuals:Visuals
 }
 
@@ -57,8 +57,18 @@ class ModchartRenderer<T:FlxBasic> extends FlxBasic {
 		count = postCount = 0;
 	}
 
-	public function sort() {
+	/* public function sort() {
 		queue.sort((a, b) -> {
+			return FlxSort.byValues(FlxSort.DESCENDING, a.item._z, b.item._z);
+		});
+	} */
+
+	public function sort() {
+		if (queue == null || queue.length <= 0)
+			return;
+		queue.sort((a, b) -> {
+			if (a == null || b == null)
+				return 0;
 			return FlxSort.byValues(FlxSort.DESCENDING, a.item._z, b.item._z);
 		});
 	}
@@ -109,8 +119,8 @@ class ModchartHoldRenderer extends ModchartRenderer<FlxSprite> {
 
 		var size = hold.frame.frame.width * hold.scale.x * .5;
 
-		var quad0 = new Vector3D(-unit.y * size, unit.x * size);
-		var quad1 = new Vector3D(unit.y * size, -unit.x * size);
+		var quad0 = new Vector3(-unit.y * size, unit.x * size);
+		var quad1 = new Vector3(unit.y * size, -unit.x * size);
 
 		@:privateAccess
 		for (i in 0...2) {
@@ -145,7 +155,7 @@ class ModchartHoldRenderer extends ModchartRenderer<FlxSprite> {
 			rotation.x = rotation.x * zScale * visuals.scaleX;
 			rotation.y = rotation.y * zScale * visuals.scaleY;
 
-			var view = new Vector3D(rotation.x + curPoint.x, rotation.y + curPoint.y, rotation.z);
+			var view = new Vector3(rotation.x + curPoint.x, rotation.y + curPoint.y, rotation.z);
 			if (Config.CAMERA3D_ENABLED)
 				view = instance.camera3D.applyViewTo(view);
 			view.z *= 0.001;
@@ -251,7 +261,7 @@ class ModchartHoldRenderer extends ModchartRenderer<FlxSprite> {
 		final player = Adapter.instance.getPlayerFromArrow(item);
 		final lane = Adapter.instance.getLaneFromArrow(item);
 
-		final basePos = new Vector3D(Adapter.instance.getDefaultReceptorX(lane, player),
+		final basePos = new Vector3(Adapter.instance.getDefaultReceptorX(lane, player),
 			Adapter.instance.getDefaultReceptorY(lane, player)).add(ModchartUtil.getHalfPos());
 
 		var vertices:openfl.Vector<Float> = new openfl.Vector<Float>(8 * HOLD_SUBDIVISIONS, true);
@@ -395,6 +405,9 @@ class ModchartArrowRenderer extends ModchartRenderer<FlxSprite> {
 	}
 
 	override public function prepare(arrow:FlxSprite) {
+		if (arrow.alpha <= 0)
+			return;
+
 		final arrowPosition = helperVector;
 
 		final player = Adapter.instance.getPlayerFromArrow(arrow);
@@ -428,7 +441,7 @@ class ModchartArrowRenderer extends ModchartRenderer<FlxSprite> {
 		// internal mods
 		final orient = instance.getPercent('orient', arrowData.player);
 		if (orient != 0) {
-			final nextOutput = instance.modifiers.getPath(new Vector3D(Adapter.instance.getDefaultReceptorX(arrowData.lane, arrowData.player)
+			final nextOutput = instance.modifiers.getPath(new Vector3(Adapter.instance.getDefaultReceptorX(arrowData.lane, arrowData.player)
 				+ Manager.ARROW_SIZEDIV2,
 				Adapter.instance.getDefaultReceptorY(arrowData.lane, arrowData.player)
 				+ Manager.ARROW_SIZEDIV2),
@@ -473,7 +486,7 @@ class ModchartArrowRenderer extends ModchartRenderer<FlxSprite> {
 			rotation.x = rotation.x * depthScale * output.visuals.scaleX;
 			rotation.y = rotation.y * depthScale * output.visuals.scaleY;
 
-			var view = new Vector3D(rotation.x + arrowPosition.x, rotation.y + arrowPosition.y, rotation.z);
+			var view = new Vector3(rotation.x + arrowPosition.x, rotation.y + arrowPosition.y, rotation.z);
 			if (Config.CAMERA3D_ENABLED)
 				view = instance.camera3D.applyViewTo(view);
 			view.z *= 0.001;
@@ -553,7 +566,7 @@ class ModchartArrowRenderer extends ModchartRenderer<FlxSprite> {
 			queue = queue.splice(count, queue.length);
 	}*/
 	private function __drawInstruction(instruction:FMDrawInstruction) {
-		if (instruction.colorData[0].alphaMultiplier <= 0)
+		if (instruction == null)
 			return;
 
 		final item = instruction.item;
@@ -568,6 +581,14 @@ class ModchartArrowRenderer extends ModchartRenderer<FlxSprite> {
 				item.antialiasing, cTransform, item.shader);
 		}
 	}
+}
+
+@:publicFields
+@:structInit
+class PathVisuals {
+	var alpha:Float = 1;
+	var scale:Float = 1;
+	var color:Int = 0xFFFFFFF;
 }
 
 class ModchartArrowPath extends ModchartRenderer<FlxSprite> {
@@ -632,17 +653,23 @@ class ModchartArrowPath extends ModchartRenderer<FlxSprite> {
 				|| (position.y >= __display.pixels.rect.height + ARROW_PATH_BOUNDARY_OFFSET))
 				continue;
 
-			pointData[pID++] = [!moved, position.x, position.y];
+			final vis:PathVisuals = {
+				alpha: alpha * output.visuals.alpha,
+				scale: thickness * output.visuals.scaleX,
+				color: 0xFFFFFF
+			};
+			pointData[pID++] = [!moved, position.x, position.y, position.z, vis];
 
 			moved = true;
 		}
 
 		var newInstruction:FMDrawInstruction = {};
-		newInstruction.mappedExtra = [
+		/* newInstruction.mappedExtra = [
 			'style' => [thickness, 0xFFFFFFFF, alpha],
 			'position' => pointData,
 			'lane' => lane
-		];
+		]; */
+		newInstruction.extra = [pointData];
 
 		queue[count] = newInstruction;
 		count++;
@@ -657,7 +684,7 @@ class ModchartArrowPath extends ModchartRenderer<FlxSprite> {
 		__shape.graphics.clear();
 		__display.cameras = Adapter.instance.getArrowCamera();
 
-		var lastLane = -1;
+		/* var lastLane = -1;
 
 		for (i in 0...queue.length) {
 			final instruction = queue[i];
@@ -690,6 +717,33 @@ class ModchartArrowPath extends ModchartRenderer<FlxSprite> {
 			}
 
 			lastLane = thisLane;
+		} */
+
+		for (i in 0...queue.length) {
+			final instruction = queue[i];
+			final data:Array<Array<Dynamic>> = cast instruction.extra[0];
+			final steps = data.iterator();
+
+			var stepsHasNext = steps.hasNext;
+			var stepsNext = steps.next;
+
+			while (stepsHasNext()) {
+				final thisStep = stepsNext();
+
+				// in case the instruction is null (if the point is not visible in screen, we skip it)
+				if (thisStep == null)
+					continue;
+
+				final needsToMove:Bool = cast thisStep[0];
+				final posX:Float = cast thisStep[1];
+				final posY:Float = cast thisStep[2];
+				final visuals:PathVisuals = cast thisStep[4];
+
+				__shape.graphics.lineStyle(visuals.scale, visuals.color, visuals.alpha, false, NORMAL);
+				__pathCommands.push(needsToMove ? GraphicsPathCommand.MOVE_TO : GraphicsPathCommand.LINE_TO);
+				__pathPoints.push(posX);
+				__pathPoints.push(posY);
+			}
 		}
 
 		__shape.graphics.drawPath(__pathCommands, __pathPoints);
@@ -708,7 +762,7 @@ class ModchartArrowPath extends ModchartRenderer<FlxSprite> {
 		__pathCommands.splice(0, __pathCommands.length);
 	}
 
-	inline static final ARROW_PATH_BOUNDARY_OFFSET:Float = 50;
+	inline static final ARROW_PATH_BOUNDARY_OFFSET:Float = 300;//50;
 }
 
 // TODO: fix this, i have this class in private cuz it sucks and doesnt even draw anything

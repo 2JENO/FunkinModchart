@@ -19,6 +19,7 @@ import flixel.FlxSprite;
 import modchart.Manager;
 import modchart.standalone.IAdapter;
 
+
 class Psych implements IAdapter {
 	private var __fCrochet:Float = 0;
 
@@ -29,7 +30,7 @@ class Psych implements IAdapter {
 		try {
 			setupLuaFunctions();
 		} catch (e) {
-			trace('[FunkinModchart Psych Adapter] Failed while adding lua functions: $e');
+			trace('[ From FunkinModchart Adapter ] Failed while adding lua functions: $e');
 		}
 	}
 

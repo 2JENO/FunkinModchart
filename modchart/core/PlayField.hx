@@ -49,6 +49,10 @@ class PlayField extends FlxBasic {
 		addModifier('stealth');
 		addModifier('skew');
 		addModifier('zoom');
+		addModifier('opponentSwap');
+		addModifier('boost');
+		addModifier('drunk');
+		addModifier('invert');
 
 		setPercent('arrowPathAlpha', 1, -1);
 		setPercent('arrowPathThickness', 1, -1);
@@ -225,22 +229,42 @@ class PlayField extends FlxBasic {
 		var receptorLength = 0;
 		var arrowLength = 0;
 		var holdLength = 0;
+		var attachmentLength = 0;
 
 		for (i in 0...playerItems.length) {
 			final curItems = playerItems[i];
 
-			receptorLength = receptorLength + curItems[0].length;
+			/* receptorLength = receptorLength + curItems[0].length;
 			arrowLength = arrowLength + curItems[1].length;
-			holdLength = holdLength + curItems[2].length;
+			holdLength = holdLength + curItems[2].length; */
+			if (curItems[0] != null)
+				receptorLength = receptorLength + curItems[0].length;
+			if (curItems[1] != null)
+				arrowLength = arrowLength + curItems[1].length;
+			if (curItems[2] != null)
+				holdLength = holdLength + curItems[2].length;
+			if (curItems[3] != null)
+				attachmentLength = attachmentLength + curItems[3].length;
 		}
 
-		receptorRenderer.preallocate(receptorLength);
+		/* receptorRenderer.preallocate(receptorLength);
 		arrowRenderer.preallocate(arrowLength);
-		holdRenderer.preallocate(holdLength);
+		holdRenderer.preallocate(holdLength); */
+
+		if (receptorLength != 0)
+			receptorRenderer.preallocate(receptorLength);
+		if (arrowLength != 0)
+			arrowRenderer.preallocate(arrowLength);
+		if (holdLength != 0)
+			holdRenderer.preallocate(holdLength);
+		if (attachmentLength != 0)
+			attachmentRenderer.preallocate(attachmentLength);
+
 		if (Manager.instance.renderArrowPaths)
 			pathRenderer.preallocate(receptorLength);
 
-		drawCB.resize(receptorLength + arrowLength + holdLength);
+		/* drawCB.resize(receptorLength + arrowLength + holdLength); */
+		drawCB.resize(receptorLength + arrowLength + holdLength + attachmentLength);
 
 		var j = 0;
 		inline function queue(f:{callback:Void->Void, z:Float}) {
@@ -295,9 +319,25 @@ class PlayField extends FlxBasic {
 					});
 				}
 			}
+
+			// attachments (splashes)
+			if (attachmentLength > 0) {
+				for (attachment in curItems[3]) {
+					if (!getVisibility(attachment))
+						continue;
+
+					attachmentRenderer.prepare(attachment);
+					queue({
+						callback: attachmentRenderer.shift,
+						z: attachment._z
+					});
+				}
+			}
 		}
 
-		for (r in [receptorRenderer, arrowRenderer, holdRenderer])
+/* 		for (r in [receptorRenderer, arrowRenderer, holdRenderer])
+			r.sort(); */
+		for (r in [receptorRenderer, arrowRenderer, holdRenderer, attachmentRenderer])
 			r.sort();
 
 		if (Manager.instance.renderArrowPaths)

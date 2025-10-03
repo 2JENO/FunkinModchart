@@ -1,4 +1,5 @@
 #if !macro
+import modchart.core.Vector3;
 import modchart.Config;
 import modchart.Manager;
 import modchart.Modifier;
