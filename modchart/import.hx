@@ -1,14 +1,19 @@
 #if !macro
+<<<<<<< HEAD
 import modchart.core.Vector3;
+=======
+import flixel.math.FlxMath;
+import flixel.tweens.FlxEase;
+>>>>>>> 52ace1208ad888f090a30be386f4285a85f86108
 import modchart.Config;
 import modchart.Manager;
-import modchart.Modifier;
-import modchart.core.util.Constants.ArrowData;
-import modchart.core.util.Constants.RenderParams;
-import modchart.core.util.Constants.Visuals;
-import modchart.core.util.Constants;
-import modchart.core.util.ModchartUtil;
-import modchart.events.Event;
-import modchart.standalone.Adapter;
+import modchart.backend.core.*;
+import modchart.backend.graphics.*;
+import modchart.backend.math.*;
+import modchart.backend.standalone.Adapter;
+import modchart.backend.util.ModchartUtil;
+import modchart.engine.*;
+import modchart.engine.events.*;
+import modchart.engine.modifiers.*;
 import openfl.geom.Vector3D;
 #end

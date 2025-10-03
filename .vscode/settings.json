@@ -4,5 +4,18 @@
         "editor.codeActionsOnSave": {
             "source.organizeImports": "always"
         }
-    }
+    },
+    "haxe.configurations": [
+		{
+			"label": "windows",
+			"args": [
+				"-lib",
+				"flixel",
+				"-lib",
+				"openfl",
+				"-lib",
+				"lime",
+			]
+		}
+	],
 }
