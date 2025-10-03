@@ -3,24 +3,7 @@ package modchart;
 import flixel.FlxBasic;
 import flixel.tweens.FlxEase.EaseFunction;
 import flixel.util.FlxSort;
-<<<<<<< HEAD
-import haxe.ds.ArraySort;
 import haxe.ds.StringMap;
-import modchart.core.ModifierGroup;
-import modchart.core.PlayField;
-import modchart.core.graphics.ModchartGraphics.ModchartArrowPath;
-import modchart.core.graphics.ModchartGraphics.ModchartArrowRenderer;
-import modchart.core.graphics.ModchartGraphics.ModchartHoldRenderer;
-import modchart.core.graphics.ModchartGraphics.ModchartRenderer;
-import modchart.core.util.Constants.ArrowData;
-import modchart.core.util.Constants.RenderParams;
-import modchart.core.util.Constants.Visuals;
-import modchart.core.util.ModchartUtil;
-import modchart.events.*;
-import modchart.events.types.*;
-import modchart.modifiers.*;
-using StringTools;
-=======
 import haxe.ds.Vector;
 import modchart.backend.core.ArrowData;
 import modchart.backend.core.ModifierParameters;
@@ -31,8 +14,7 @@ import modchart.backend.util.ModchartUtil;
 import modchart.engine.modifiers.list.*;
 import modchart.events.*;
 import modchart.events.types.*;
->>>>>>> 52ace1208ad888f090a30be386f4285a85f86108
-
+using StringTools;
 @:allow(modchart.backend.ModifierGroup)
 @:access(modchart.engine.PlayField)
 #if !openfl_debug
@@ -68,7 +50,6 @@ final class Manager extends FlxBasic {
 		addPlayfield();
 	}
 
-<<<<<<< HEAD
 	public function queueSet(step:Float, modName:String, percent:Float, player:Null<Int>) {
 		set(parseMod(modName), bfs(step), percent * 0.001, parsePlayer(player));
 	}
@@ -101,14 +82,12 @@ final class Manager extends FlxBasic {
 
 	private final bfs:Float->Float = (s) -> Adapter.instance.getBeatFromStep(s);
 
-=======
 	/**
 	 * Internal helper function to apply a function to each playfield.
 	 *
 	 * @param func The function to apply to each playfield.
 	 * @param player Optionally, the specific player to target (-1 for all).
 	 */
->>>>>>> 52ace1208ad888f090a30be386f4285a85f86108
 	@:noCompletion
 	private inline function __forEachPlayfield(func:PlayField->Void, player:Int = -1) {
 		// If there's only one playfield or a specific player is provided, apply the function directly

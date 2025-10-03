@@ -1,10 +1,6 @@
 #if !macro
-<<<<<<< HEAD
-import modchart.core.Vector3;
-=======
 import flixel.math.FlxMath;
 import flixel.tweens.FlxEase;
->>>>>>> 52ace1208ad888f090a30be386f4285a85f86108
 import modchart.Config;
 import modchart.Manager;
 import modchart.backend.core.*;
